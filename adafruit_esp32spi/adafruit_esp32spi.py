@@ -151,6 +151,8 @@ class ESP_SPIcontrol:  # pylint: disable=too-many-public-methods, too-many-insta
         self._sendbuf = bytearray(256)  # buffer for command sending
         self._socknum_ll = [[0]]  # pre-made list of list of socket #
 
+        self.ready_timeout = 10 # default timeout to wait for a ready state in seconds
+
         self._spi_device = SPIDevice(spi, cs_dio, baudrate=8000000)
         self._cs = cs_dio
         self._ready = ready_dio
@@ -187,7 +189,7 @@ class ESP_SPIcontrol:  # pylint: disable=too-many-public-methods, too-many-insta
         if self._debug >= 3:
             print("Wait for ESP32 ready", end="")
         times = time.monotonic()
-        while (time.monotonic() - times) < 10:  # wait up to 10 seconds
+        while (time.monotonic() - times) < self.ready_timeout:  # wait up to ready_timeout seconds
             if not self._ready.value:  # we're ready!
                 break
             if self._debug >= 3:
